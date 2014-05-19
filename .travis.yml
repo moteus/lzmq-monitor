@@ -6,10 +6,10 @@ env:
     - LUAROCKS_VER=2.1.0
   matrix:
     - LUA=lua5.1 ZMQ_VER=zeromq3 LZMQ=lzmq LUA_SFX=
-    # - LUA=lua5.1 ZMQ_VER=zeromq4 LZMQ=lzmq LUA_SFX=
-    # - LUA=lua5.2 ZMQ_VER=zeromq3 LZMQ=lzmq LUA_SFX=
-    # - LUA=luajit ZMQ_VER=zeromq3 LZMQ=ffi  LUA_SFX=jit
-    # - LUA=luajit ZMQ_VER=zeromq4 LZMQ=ffi  LUA_SFX=jit
+    - LUA=lua5.1 ZMQ_VER=zeromq4 LZMQ=lzmq LUA_SFX=
+    - LUA=lua5.2 ZMQ_VER=zeromq3 LZMQ=lzmq LUA_SFX=
+    - LUA=luajit ZMQ_VER=zeromq3 LZMQ=ffi  LUA_SFX=jit
+    - LUA=luajit ZMQ_VER=zeromq4 LZMQ=ffi  LUA_SFX=jit
 
 branches:
   only:
@@ -27,6 +27,9 @@ install:
       sudo luarocks install https://raw.githubusercontent.com/moteus/lzmq/master/rockspecs/lzmq-ffi-scm-0.rockspec;
     else
       sudo luarocks install https://raw.githubusercontent.com/moteus/lzmq/master/rockspecs/lzmq-scm-0.rockspec;
+    fi
+  - if [ $LUA = "lua5.1" ]; then
+      sudo luarocks install bit32;
     fi
   - sudo luarocks make rockspecs/lzmq-monitor-scm-0.rockspec
 

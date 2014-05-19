@@ -1,8 +1,15 @@
 return function (pipe, handle)
 
+local function prequire(...)
+  local ok, mod = pcall(require, ...)
+  if ok then return mod end
+  return nil, mod
+end
+
 local zmq      = require "lzmq"
 local zloop    = require "lzmq.loop"
-local bit      = require "bit32"
+local bit      = prequire "bit"
+if not bit then bit = require "bit32" end
 
 local loop
 local ctx       = pipe:context()
