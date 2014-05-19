@@ -1,0 +1,40 @@
+language: erlang
+
+env:
+  global:
+    - PLATFORM=linux
+    - LUAROCKS_VER=2.1.0
+  matrix:
+    - LUA=lua5.1 ZMQ_VER=zeromq3 LZMQ=lzmq LUA_SFX=
+    # - LUA=lua5.1 ZMQ_VER=zeromq4 LZMQ=lzmq LUA_SFX=
+    # - LUA=lua5.2 ZMQ_VER=zeromq3 LZMQ=lzmq LUA_SFX=
+    # - LUA=luajit ZMQ_VER=zeromq3 LZMQ=ffi  LUA_SFX=jit
+    # - LUA=luajit ZMQ_VER=zeromq4 LZMQ=ffi  LUA_SFX=jit
+
+branches:
+  only:
+    - master
+
+before_install:
+  - bash .travis/setup_lua.sh
+  - bash .travis/setup_zmq.sh
+
+install:
+  - sudo luarocks install https://raw.github.com/moteus/lunit/moteus-skip/rockspecs/lunitx-scm.mot.skip-0.rockspec
+  - sudo luarocks install https://raw.github.com/moteus/lua-llthreads2/master/rockspecs/lua-llthreads2-scm-0.rockspec
+  - if [ $LZMQ = "ffi" ]; then
+      sudo luarocks install https://raw2.github.com/justincormack/ljsyscall/master/rockspec/ljsyscall-0.9-1.rockspec;
+      sudo luarocks install https://raw.githubusercontent.com/moteus/lzmq/master/rockspecs/lzmq-ffi-scm-0.rockspec;
+    else
+      sudo luarocks install https://raw.githubusercontent.com/moteus/lzmq/master/rockspecs/lzmq-scm-0.rockspec;
+    fi
+  - sudo luarocks make rockspecs/lzmq-monitor-scm-0.rockspec
+
+script:
+  - cd test
+  - lunit.sh -i lua$LUA_SFX test_monitor.lua
+
+notifications:
+  email:
+    on_success: change
+    on_failure: always
