@@ -130,6 +130,10 @@ function zmonitor:verbose(...)
   return self:recvx()
 end
 
+function zmonitor:handle()
+  return self.private_.pipe
+end
+
 end
 
 return {
