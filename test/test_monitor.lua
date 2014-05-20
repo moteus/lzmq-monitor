@@ -12,9 +12,9 @@ local _ENV = TEST_CASE "lzmq.monitor" do
 local ctx, sink, sinkmon, source, sourcemon
 
 local function check_event(self, expected_event)
-  local desc, event = self:recvx()
-  zmq.assert(desc, event)
-  event = assert(tonumber(event))
+  local event, value, address, desc = self:recvx()
+  assert(event, value)
+  event = assert_number(tonumber(event), event)
   return event == expected_event
 end
 

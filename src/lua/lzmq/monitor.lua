@@ -28,41 +28,40 @@ function zmonitor:new(skt)
     }
   }, self)
 
-  assert(o:_init())
-  return o
+  return o:_init()
 end
 
 function zmonitor:_init()
-  if not self:started() then
-    local thread, pipe = zthreads.fork(self:context(),
-      monitor_thread_proc, self.private_.skt:lightuserdata()
-    )
+  assert(not self:started())
+  local thread, pipe = zthreads.fork(self:context(),
+    monitor_thread_proc, self.private_.skt:lightuserdata()
+  )
 
-    if not thread then return nil, pipe end
-    thread:start(true, true)
-    local ok, err = pipe:recvx()
+  if not thread then return nil, pipe end
+  thread:start(true, true)
+  local ok, err = pipe:recvx()
 
-    if not ok then -- thread terminate
-      if not pipe:closed() then
-        pipe:send('TERMINATE') -- just in case
-      end
-      thread:join()
-      pipe:close()
-      return nil, err
+  if not ok then -- thread terminate
+    if not pipe:closed() then
+      pipe:send('TERMINATE') -- just in case
     end
-
-    if ok == 'ERROR' then
-      thread:join()
-      pipe:close()
-      return nil, err
-    end
-
-    assert(ok == 'OK')
-
-    self.private_.thread, self.private_.pipe = thread, pipe
-    pipe:set_rcvtimeo(100)
+    thread:join()
+    pipe:close()
+    return nil, err
   end
-  return true
+
+  if ok == 'ERROR' then
+    thread:join()
+    pipe:close()
+    return nil, err
+  end
+
+  assert(ok == 'OK')
+
+  self.private_.thread, self.private_.pipe = thread, pipe
+  pipe:set_rcvtimeo(100)
+
+  return self
 end
 
 function zmonitor:destroy()

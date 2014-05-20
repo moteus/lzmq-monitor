@@ -54,7 +54,7 @@ on_event = function(sok)
   log("I: zmonitor: %s - %s", description, address)
 
   pipe:sendx(
-    description, tostring(event), tostring(value), address
+    tostring(event), tostring(value), address, description
   )
 end
 
